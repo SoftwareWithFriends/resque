@@ -214,7 +214,7 @@ module Resque
       queues.each do |queue|
         log! "Checking #{queue}"
         if job = Resque.reserve(queue)
-          log! "Found job on #{queue}"
+          log "Found job on #{queue}"
           return job
         end
       end
@@ -361,11 +361,11 @@ module Resque
     # is processing will not be completed.
     def kill_child
       if @child
-        log! "Killing child at #{@child}"
+        log "Killing child at #{@child}"
         if `ps -o pid,state -p #{@child}`
           Process.kill("KILL", @child) rescue nil
         else
-          log! "Child #{@child} not found, restarting."
+          log "Child #{@child} not found, restarting."
           shutdown
         end
       end
@@ -377,20 +377,20 @@ module Resque
     def new_kill_child
       if @child
         unless Process.waitpid(@child, Process::WNOHANG)
-          log! "Sending TERM signal to child #{@child}"
+          log "Sending TERM signal to child #{@child}"
           Process.kill("TERM", @child)
           (term_timeout.to_f * 10).round.times do |i|
             sleep(0.1)
             return if Process.waitpid(@child, Process::WNOHANG)
           end
-          log! "Sending KILL signal to child #{@child}"
+          log "Sending KILL signal to child #{@child}"
           Process.kill("KILL", @child)
         else
-          log! "Child #{@child} already quit."
+          log "Child #{@child} already quit."
         end
       end
     rescue SystemCallError
-      log! "Child #{@child} already quit and reaped."
+      log "Child #{@child} already quit and reaped."
     end
 
     # are we paused?
